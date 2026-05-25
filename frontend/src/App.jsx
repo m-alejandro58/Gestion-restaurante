@@ -56,6 +56,18 @@ function App() {
     }
   };
 
+  const handleDelete = async (id) => {
+    try {
+      await axios.delete(
+        `http://localhost:5000/api/products/${id}`
+      );
+
+      getProducts();
+    } catch (error) {
+      console.error("Error eliminando producto");
+    }
+  };
+
   return (
     <div style={{ padding: "20px" }}>
       <h1>Gestión Restaurante</h1>
@@ -128,6 +140,12 @@ function App() {
           <p>Categoría: {product.category}</p>
 
           <p>Stock: {product.stock}</p>
+
+          <button
+            onClick={() => handleDelete(product._id)}
+          >
+            Eliminar
+          </button>
         </div>
       ))}
     </div>
