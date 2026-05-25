@@ -4,6 +4,8 @@ import axios from "axios";
 function App() {
   const [products, setProducts] = useState([]);
 
+  const [editingId, setEditingId] = useState(null);
+
   const [formData, setFormData] = useState({
     name: "",
     price: "",
@@ -38,10 +40,19 @@ function App() {
     e.preventDefault();
 
     try {
-      await axios.post(
-        "http://localhost:5000/api/products",
-        formData
-      );
+      if (editingId) {
+        await axios.put(
+          `http://localhost:5000/api/products/${editingId}`,
+          formData
+        );
+
+        setEditingId(null);
+      } else {
+        await axios.post(
+          "http://localhost:5000/api/products",
+          formData
+        );
+      }
 
       setFormData({
         name: "",
@@ -52,7 +63,7 @@ function App() {
 
       getProducts();
     } catch (error) {
-      console.error("Error creando producto");
+      console.error("Error guardando producto");
     }
   };
 
@@ -68,11 +79,26 @@ function App() {
     }
   };
 
+  const handleEdit = (product) => {
+    setEditingId(product._id);
+
+    setFormData({
+      name: product.name,
+      price: product.price,
+      category: product.category,
+      stock: product.stock
+    });
+  };
+
   return (
     <div style={{ padding: "20px" }}>
       <h1>Gestión Restaurante</h1>
 
-      <h2>Agregar Producto</h2>
+      <h2>
+        {editingId
+          ? "Editar Producto"
+          : "Agregar Producto"}
+      </h2>
 
       <form onSubmit={handleSubmit}>
         <input
@@ -116,7 +142,9 @@ function App() {
         <br /><br />
 
         <button type="submit">
-          Guardar Producto
+          {editingId
+            ? "Actualizar Producto"
+            : "Guardar Producto"}
         </button>
       </form>
 
@@ -142,7 +170,14 @@ function App() {
           <p>Stock: {product.stock}</p>
 
           <button
+            onClick={() => handleEdit(product)}
+          >
+            Editar
+          </button>
+
+          <button
             onClick={() => handleDelete(product._id)}
+            style={{ marginLeft: "10px" }}
           >
             Eliminar
           </button>

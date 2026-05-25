@@ -47,8 +47,27 @@ const deleteProduct = async (req, res) => {
   }
 };
 
+const updateProduct = async (req, res) => {
+  try {
+    const updatedProduct = await Product.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      {
+        new: true
+      }
+    );
+
+    res.json(updatedProduct);
+  } catch (error) {
+    res.status(500).json({
+      message: "Error actualizando producto"
+    });
+  }
+};
+
 module.exports = {
   getProducts,
   createProduct,
-  deleteProduct
+  deleteProduct,
+  updateProduct
 };
