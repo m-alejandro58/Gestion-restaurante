@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+import ProductCard from "./components/ProductCard";
 
 function App() {
   const [products, setProducts] = useState([]);
@@ -105,6 +106,18 @@ function App() {
     }
   };
 
+  const totalProducts = products.length;
+
+  const totalCategories = new Set(
+    products.map((product) => product.category)
+  ).size;
+
+  const totalInventoryValue = products.reduce(
+    (acc, product) =>
+      acc + product.price * product.stock,
+    0
+  );
+
   const filteredProducts = products.filter((product) =>
     product.name.toLowerCase().includes(
       search.toLowerCase()
@@ -134,8 +147,42 @@ function App() {
           Control de inventario y administración de productos
         </p>
 
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+
+          <div className="bg-white rounded-2xl shadow-lg p-6 border border-orange-100 text-center">
+            <h3 className="text-xl font-semibold text-orange-700 mb-2">
+              Productos
+            </h3>
+
+            <p className="text-4xl font-bold text-amber-900">
+              {totalProducts}
+            </p>
+          </div>
+
+          <div className="bg-white rounded-2xl shadow-lg p-6 border border-orange-100 text-center">
+            <h3 className="text-xl font-semibold text-orange-700 mb-2">
+              Categorías
+            </h3>
+
+            <p className="text-4xl font-bold text-amber-900">
+              {totalCategories}
+            </p>
+          </div>
+
+          <div className="bg-white rounded-2xl shadow-lg p-6 border border-orange-100 text-center">
+            <h3 className="text-xl font-semibold text-orange-700 mb-2">
+              Valor Inventario
+            </h3>
+
+            <p className="text-4xl font-bold text-amber-900">
+              ${totalInventoryValue}
+            </p>
+          </div>
+
+        </div>
+
         <div className="bg-white rounded-2xl shadow-lg p-8 mb-12 border border-orange-100">
-          
+
           <h2 className="text-3xl font-semibold text-amber-900 text-center mb-8">
             {editingId
               ? "Editar Producto"
@@ -213,59 +260,18 @@ function App() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="border border-orange-200 p-4 rounded-xl w-full md:w-[350px] focus:outline-none focus:ring-2 focus:ring-orange-400"
-  />
+          />
 
-</div>
+        </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {filteredProducts.map((product) => (
-            <div
+            <ProductCard
               key={product._id}
-              className="bg-white rounded-2xl shadow-lg p-6 border border-orange-100 hover:shadow-xl transition duration-300"
-            >
-              <h3 className="text-2xl font-bold text-amber-900 mb-4 text-center">
-                {product.name}
-              </h3>
-
-              <div className="space-y-2 text-orange-900">
-                <p>
-                  <span className="font-semibold">
-                    Precio:
-                  </span>{" "}
-                  ${product.price}
-                </p>
-
-                <p>
-                  <span className="font-semibold">
-                    Categoría:
-                  </span>{" "}
-                  {product.category}
-                </p>
-
-                <p>
-                  <span className="font-semibold">
-                    Stock:
-                  </span>{" "}
-                  {product.stock}
-                </p>
-              </div>
-
-              <div className="flex justify-center gap-4 mt-6">
-                <button
-                  onClick={() => handleEdit(product)}
-                  className="bg-amber-600 hover:bg-amber-700 text-white px-5 py-2 rounded-lg transition duration-300"
-                >
-                  Editar
-                </button>
-
-                <button
-                  onClick={() => handleDelete(product._id)}
-                  className="bg-red-500 hover:bg-red-600 text-white px-5 py-2 rounded-lg transition duration-300"
-                >
-                  Eliminar
-                </button>
-              </div>
-            </div>
+              product={product}
+              handleEdit={handleEdit}
+              handleDelete={handleDelete}
+            />
           ))}
         </div>
 
