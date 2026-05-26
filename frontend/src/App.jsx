@@ -8,6 +8,8 @@ function App() {
 
   const [search, setSearch] = useState("");
 
+  const [error, setError] = useState("");
+
   const [formData, setFormData] = useState({
     name: "",
     price: "",
@@ -40,6 +42,28 @@ function App() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    setError("");
+
+    if (
+      !formData.name ||
+      !formData.price ||
+      !formData.category ||
+      !formData.stock
+    ) {
+      setError("Todos los campos son obligatorios");
+      return;
+    }
+
+    if (formData.price <= 0) {
+      setError("El precio debe ser mayor a 0");
+      return;
+    }
+
+    if (formData.stock < 0) {
+      setError("El stock no puede ser negativo");
+      return;
+    }
 
     try {
       if (editingId) {
@@ -117,6 +141,12 @@ function App() {
               ? "Editar Producto"
               : "Agregar Producto"}
           </h2>
+
+          {error && (
+            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-xl mb-6 text-center">
+              {error}
+            </div>
+          )}
 
           <form
             onSubmit={handleSubmit}
