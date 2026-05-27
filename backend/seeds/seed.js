@@ -1,10 +1,10 @@
 const mongoose = require("mongoose");
 const path = require("path");
-require("dotenv").config({ path: path.join(__dirname, "../backend/.env") });
+require("dotenv").config({ path: path.join(__dirname, "../.env") });
 
-const Product = require("../backend/models/Product");
-const Table = require("../backend/models/Table");
-const Order = require("../backend/models/Order");
+const Product = require("../models/Product");
+const Table = require("../models/Table");
+const Order = require("../models/Order");
 
 const products = [
   { name: "Bandeja Paisa", price: 28000, category: "Platos fuertes", stock: 20 },
