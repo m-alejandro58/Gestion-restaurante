@@ -32,7 +32,7 @@ function Navbar() {
                 }`
               }
             >
-              Dashboard
+              Inicio
             </NavLink>
 
             <NavLink

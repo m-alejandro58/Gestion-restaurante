@@ -1,8 +1,10 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import axios from "axios";
 import MainLayout from "../layouts/MainLayout";
 import ProductForm from "../components/ProductForm";
 import ProductCard from "../components/ProductCard";
+import Toast from "../components/Toast";
+import ConfirmDialog from "../components/ConfirmDialog";
 
 function Products() {
   const [products, setProducts] = useState([]);
@@ -13,12 +15,24 @@ function Products() {
 
   const [error, setError] = useState("");
 
+  const [toast, setToast] = useState(null);
+
+  const [confirmDialog, setConfirmDialog] = useState(null);
+
   const [formData, setFormData] = useState({
     name: "",
     price: "",
     category: "",
     stock: ""
   });
+
+  const showToast = (message, type = "success") => {
+    setToast({ message, type });
+  };
+
+  const closeToast = useCallback(() => {
+    setToast(null);
+  }, []);
 
   const getProducts = async () => {
     try {
@@ -29,7 +43,7 @@ function Products() {
       setProducts(response.data);
 
     } catch (error) {
-      console.error("Error obteniendo productos");
+      showToast("Error al obtener los productos", "error");
     }
   };
 
@@ -78,7 +92,7 @@ function Products() {
           formData
         );
 
-        alert("Producto actualizado");
+        showToast("Producto actualizado correctamente");
 
         setEditingId(null);
 
@@ -89,7 +103,7 @@ function Products() {
           formData
         );
 
-        alert("Producto agregado");
+        showToast("Producto agregado correctamente");
       }
 
       setFormData({
@@ -102,31 +116,30 @@ function Products() {
       getProducts();
 
     } catch (error) {
-      console.error("Error guardando producto");
+      showToast("Error al guardar el producto", "error");
     }
   };
 
-  const handleDelete = async (id) => {
-    const confirmDelete = window.confirm(
-      "¿Seguro que deseas eliminar este producto?"
-    );
+  const handleDelete = (id) => {
+    setConfirmDialog({
+      message: "¿Seguro que deseas eliminar este producto? Esta acción no se puede deshacer.",
+      onConfirm: async () => {
+        setConfirmDialog(null);
+        try {
+          await axios.delete(
+            `http://localhost:5000/api/products/${id}`
+          );
 
-    if (!confirmDelete) {
-      return;
-    }
+          showToast("Producto eliminado correctamente");
 
-    try {
-      await axios.delete(
-        `http://localhost:5000/api/products/${id}`
-      );
+          getProducts();
 
-      alert("Producto eliminado");
-
-      getProducts();
-
-    } catch (error) {
-      console.error("Error eliminando producto");
-    }
+        } catch (error) {
+          showToast("Error al eliminar el producto", "error");
+        }
+      },
+      onCancel: () => setConfirmDialog(null)
+    });
   };
 
   const handleEdit = (product) => {
@@ -147,18 +160,34 @@ function Products() {
   };
 
   const filteredProducts = products.filter(
-  (product) =>
-    product.name
-      .toLowerCase()
-      .includes(search.toLowerCase()) ||
+    (product) =>
+      product.name
+        .toLowerCase()
+        .includes(search.toLowerCase()) ||
 
-    product.category
-      .toLowerCase()
-      .includes(search.toLowerCase())
-);
+      product.category
+        .toLowerCase()
+        .includes(search.toLowerCase())
+  );
 
   return (
     <MainLayout>
+
+      {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={closeToast}
+        />
+      )}
+
+      {confirmDialog && (
+        <ConfirmDialog
+          message={confirmDialog.message}
+          onConfirm={confirmDialog.onConfirm}
+          onCancel={confirmDialog.onCancel}
+        />
+      )}
 
       <h1 className="text-5xl font-bold text-center text-amber-900 mb-3">
         Gestión de Productos
