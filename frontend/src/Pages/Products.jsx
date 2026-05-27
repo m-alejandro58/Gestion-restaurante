@@ -120,11 +120,16 @@ function Products() {
     });
   };
 
-  const filteredProducts = products.filter((product) =>
+  const filteredProducts = products.filter(
+  (product) =>
     product.name
       .toLowerCase()
+      .includes(search.toLowerCase()) ||
+
+    product.category
+      .toLowerCase()
       .includes(search.toLowerCase())
-  );
+);
 
   return (
     <MainLayout>
@@ -144,15 +149,63 @@ function Products() {
         editingId={editingId}
       />
 
-      <div className="mb-10">
+      <div className="bg-white rounded-3xl shadow-lg border border-orange-100 p-6 mb-10">
 
-        <input
-          type="text"
-          placeholder="Buscar producto..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="w-full border border-orange-200 p-4 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-400 bg-white shadow-sm"
-        />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+          <div>
+
+            <label className="block text-orange-900 font-semibold mb-3">
+              Buscar producto
+            </label>
+
+            <input
+              type="text"
+              placeholder="Buscar por nombre..."
+              value={search}
+              onChange={(e) =>
+                setSearch(e.target.value)
+              }
+              className="w-full border border-orange-200 bg-orange-50 p-4 rounded-2xl focus:outline-none focus:ring-2 focus:ring-orange-400"
+            />
+
+          </div>
+
+          <div>
+
+            <label className="block text-orange-900 font-semibold mb-3">
+              Filtrar por categoría
+            </label>
+
+            <select
+              onChange={(e) =>
+                setSearch(e.target.value)
+              }
+              className="w-full border border-orange-200 bg-orange-50 p-4 rounded-2xl focus:outline-none focus:ring-2 focus:ring-orange-400"
+            >
+
+              <option value="">
+                Todas las categorías
+              </option>
+
+              {[...new Set(
+                products.map(
+                  (product) => product.category
+                )
+              )].map((category, index) => (
+                <option
+                  key={index}
+                  value={category}
+                >
+                  {category}
+                </option>
+              ))}
+
+            </select>
+
+          </div>
+
+        </div>
 
       </div>
 
