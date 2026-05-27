@@ -11,6 +11,8 @@ function Products() {
 
   const [search, setSearch] = useState("");
 
+  const [error, setError] = useState("");
+
   const [formData, setFormData] = useState({
     name: "",
     price: "",
@@ -36,6 +38,7 @@ function Products() {
   }, []);
 
   const handleChange = (e) => {
+    setError("");
     setFormData({
       ...formData,
       [e.target.name]: e.target.value
@@ -44,6 +47,28 @@ function Products() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    setError("");
+
+    if (
+      !formData.name ||
+      !formData.price ||
+      !formData.category ||
+      !formData.stock
+    ) {
+      setError("Todos los campos son obligatorios");
+      return;
+    }
+
+    if (formData.price <= 0) {
+      setError("El precio debe ser mayor a 0");
+      return;
+    }
+
+    if (formData.stock < 0) {
+      setError("El stock no puede ser negativo");
+      return;
+    }
 
     try {
       if (editingId) {
@@ -106,6 +131,7 @@ function Products() {
 
   const handleEdit = (product) => {
     setEditingId(product._id);
+    setError("");
 
     setFormData({
       name: product.name,
@@ -147,6 +173,7 @@ function Products() {
         handleChange={handleChange}
         handleSubmit={handleSubmit}
         editingId={editingId}
+        error={error}
       />
 
       <div className="bg-white rounded-3xl shadow-lg border border-orange-100 p-6 mb-10">

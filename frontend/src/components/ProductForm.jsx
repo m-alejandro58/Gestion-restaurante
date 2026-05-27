@@ -2,7 +2,8 @@ function ProductForm({
   formData,
   handleChange,
   handleSubmit,
-  editingId
+  editingId,
+  error
 }) {
   return (
     <div className="bg-white rounded-3xl shadow-xl border border-orange-100 p-10 mb-12">
@@ -20,6 +21,12 @@ function ProductForm({
         </p>
 
       </div>
+
+      {error && (
+        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-xl mb-6 text-center font-semibold">
+          {error}
+        </div>
+      )}
 
       <form
         onSubmit={handleSubmit}
