@@ -17,9 +17,7 @@ const getOrders = async (req, res) => {
  
     res.json(orders);
   } catch (error) {
-    res.status(500).json({
-      message: "Error obteniendo pedidos"
-    });
+    res.status(500).json({ message: "Error obteniendo pedidos" });
   }
 };
  
@@ -30,16 +28,12 @@ const getOrderById = async (req, res) => {
       .populate("items.product", "name price category");
  
     if (!order) {
-      return res.status(404).json({
-        message: "Pedido no encontrado"
-      });
+      return res.status(404).json({ message: "Pedido no encontrado" });
     }
  
     res.json(order);
   } catch (error) {
-    res.status(500).json({
-      message: "Error obteniendo pedido"
-    });
+    res.status(500).json({ message: "Error obteniendo pedido" });
   }
 };
  
@@ -56,9 +50,7 @@ const createOrder = async (req, res) => {
     const tableExists = await Table.findById(table);
  
     if (!tableExists) {
-      return res.status(404).json({
-        message: "Mesa no encontrada"
-      });
+      return res.status(404).json({ message: "Mesa no encontrada" });
     }
  
     let total = 0;
@@ -89,20 +81,17 @@ const createOrder = async (req, res) => {
     }
  
     const order = new Order({ table, items: resolvedItems, total, notes });
- 
     const savedOrder = await order.save();
  
     await Table.findByIdAndUpdate(table, { status: "occupied" });
  
-    const populated = await savedOrder
+    const populated = await Order.findById(savedOrder._id)
       .populate("table", "number location")
-      .then((o) => o.populate("items.product", "name price"));
+      .populate("items.product", "name price");
  
     res.status(201).json(populated);
   } catch (error) {
-    res.status(500).json({
-      message: "Error creando pedido"
-    });
+    res.status(500).json({ message: "Error creando pedido" });
   }
 };
  
@@ -111,9 +100,7 @@ const updateOrder = async (req, res) => {
     const order = await Order.findById(req.params.id);
  
     if (!order) {
-      return res.status(404).json({
-        message: "Pedido no encontrado"
-      });
+      return res.status(404).json({ message: "Pedido no encontrado" });
     }
  
     const updatedOrder = await Order.findByIdAndUpdate(
@@ -128,16 +115,12 @@ const updateOrder = async (req, res) => {
       req.body.status === "delivered" ||
       req.body.status === "cancelled"
     ) {
-      await Table.findByIdAndUpdate(order.table, {
-        status: "available"
-      });
+      await Table.findByIdAndUpdate(order.table, { status: "available" });
     }
  
     res.json(updatedOrder);
   } catch (error) {
-    res.status(500).json({
-      message: "Error actualizando pedido"
-    });
+    res.status(500).json({ message: "Error actualizando pedido" });
   }
 };
  
@@ -146,20 +129,14 @@ const deleteOrder = async (req, res) => {
     const order = await Order.findById(req.params.id);
  
     if (!order) {
-      return res.status(404).json({
-        message: "Pedido no encontrado"
-      });
+      return res.status(404).json({ message: "Pedido no encontrado" });
     }
  
     await Order.findByIdAndDelete(req.params.id);
  
-    res.json({
-      message: "Pedido eliminado"
-    });
+    res.json({ message: "Pedido eliminado" });
   } catch (error) {
-    res.status(500).json({
-      message: "Error eliminando pedido"
-    });
+    res.status(500).json({ message: "Error eliminando pedido" });
   }
 };
  
