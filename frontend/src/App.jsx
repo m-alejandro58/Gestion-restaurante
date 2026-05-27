@@ -9,7 +9,13 @@ function App() {
 
   const [search, setSearch] = useState("");
 
+  const [selectedCategory, setSelectedCategory] =
+    useState("Todas");
+
   const [error, setError] = useState("");
+
+  const [successMessage, setSuccessMessage] =
+    useState("");
 
   const [formData, setFormData] = useState({
     name: "",
@@ -39,6 +45,14 @@ function App() {
       ...formData,
       [e.target.name]: e.target.value
     });
+  };
+
+  const showSuccessMessage = (message) => {
+    setSuccessMessage(message);
+
+    setTimeout(() => {
+      setSuccessMessage("");
+    }, 3000);
   };
 
   const handleSubmit = async (e) => {
@@ -74,10 +88,18 @@ function App() {
         );
 
         setEditingId(null);
+
+        showSuccessMessage(
+          "Producto actualizado correctamente"
+        );
       } else {
         await axios.post(
           "http://localhost:5000/api/products",
           formData
+        );
+
+        showSuccessMessage(
+          "Producto agregado correctamente"
         );
       }
 
@@ -89,6 +111,7 @@ function App() {
       });
 
       getProducts();
+
     } catch (error) {
       console.error("Error guardando producto");
     }
@@ -100,10 +123,26 @@ function App() {
         `http://localhost:5000/api/products/${id}`
       );
 
+      showSuccessMessage(
+        "Producto eliminado correctamente"
+      );
+
       getProducts();
+
     } catch (error) {
       console.error("Error eliminando producto");
     }
+  };
+
+  const handleEdit = (product) => {
+    setEditingId(product._id);
+
+    setFormData({
+      name: product.name,
+      price: product.price,
+      category: product.category,
+      stock: product.stock
+    });
   };
 
   const totalProducts = products.length;
@@ -118,22 +157,29 @@ function App() {
     0
   );
 
-  const filteredProducts = products.filter((product) =>
-    product.name.toLowerCase().includes(
-      search.toLowerCase()
+  const categories = [
+    "Todas",
+    ...new Set(
+      products.map((product) => product.category)
     )
+  ];
+
+  const filteredProducts = products.filter(
+    (product) => {
+      const matchesSearch =
+        product.name
+          .toLowerCase()
+          .includes(search.toLowerCase());
+
+      const matchesCategory =
+        selectedCategory === "Todas" ||
+        product.category === selectedCategory;
+
+      return (
+        matchesSearch && matchesCategory
+      );
+    }
   );
-
-  const handleEdit = (product) => {
-    setEditingId(product._id);
-
-    setFormData({
-      name: product.name,
-      price: product.price,
-      category: product.category,
-      stock: product.stock
-    });
-  };
 
   return (
     <div className="min-h-screen bg-orange-50 p-8">
@@ -188,6 +234,12 @@ function App() {
               ? "Editar Producto"
               : "Agregar Producto"}
           </h2>
+
+          {successMessage && (
+            <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-xl mb-6 text-center">
+              {successMessage}
+            </div>
+          )}
 
           {error && (
             <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-xl mb-6 text-center">
@@ -254,13 +306,36 @@ function App() {
             Productos Registrados
           </h2>
 
-          <input
-            type="text"
-            placeholder="Buscar producto..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="border border-orange-200 p-4 rounded-xl w-full md:w-[350px] focus:outline-none focus:ring-2 focus:ring-orange-400"
-          />
+          <div className="flex flex-col md:flex-row gap-4 w-full md:w-auto">
+
+            <input
+              type="text"
+              placeholder="Buscar producto..."
+              value={search}
+              onChange={(e) =>
+                setSearch(e.target.value)
+              }
+              className="border border-orange-200 p-4 rounded-xl w-full md:w-[250px] focus:outline-none focus:ring-2 focus:ring-orange-400"
+            />
+
+            <select
+              value={selectedCategory}
+              onChange={(e) =>
+                setSelectedCategory(e.target.value)
+              }
+              className="border border-orange-200 p-4 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-400 bg-white"
+            >
+              {categories.map((category) => (
+                <option
+                  key={category}
+                  value={category}
+                >
+                  {category}
+                </option>
+              ))}
+            </select>
+
+          </div>
 
         </div>
 
