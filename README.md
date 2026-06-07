@@ -7,6 +7,8 @@ Aplicación web de 3 capas para la administración integral de un restaurante. P
 | Nombre                           | Rol                                                       |
 | -------------------------------- | --------------------------------------------------------- |
 | Manuel Alejandro Alvarez Meneses | Full-Stack Developer (Frontend + Backend + Base de Datos) |
+| Juan Felipe Londoño Marin        | DB-Developer                                              |
+| Santiago Aristizabal Muñoz       | Frontend Developer                                        |
 
 ## 🛠️ Tecnologías
 
